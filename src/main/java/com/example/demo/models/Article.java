@@ -5,7 +5,10 @@ import java.util.Set;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * @author khoi.tranvan
@@ -22,17 +25,17 @@ public class Article {
 	@Size(max=100)
 	private String title;
 	
-	@NotBlank
-	@Temporal(TemporalType.DATE)
-    private Date created_date;
+	@NotNull
+	@Temporal(TemporalType.TIMESTAMP)
+    private java.util.Date created_date;
 	
-	@NotBlank
-	@Temporal(TemporalType.DATE)
-    private Date expired_date;
+	@NotNull
+	@Temporal(TemporalType.TIMESTAMP)
+    private java.util.Date expired_date;
 	
-	@NotBlank 
+	@NotNull
 	private boolean active;
-	/*
+	
 	//One article can have many files
 	 @OneToMany(mappedBy = "article", fetch = FetchType.LAZY,
 	            cascade = CascadeType.ALL)
@@ -47,7 +50,7 @@ public class Article {
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "falcuty_id", nullable = false)
 	private Falcuty falcuty;
-*/
+
 	public Article(String title,Date created_date,  Date expired_date,boolean active) {
 		super();
 		this.title = title;
@@ -56,6 +59,7 @@ public class Article {
 		this.active = active;
 	}
 
+	public Article() {}
 	public long getId() {
 		return id;
 	}
@@ -94,6 +98,22 @@ public class Article {
 
 	public void setActive(boolean active) {
 		this.active = active;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public Falcuty getFalcuty() {
+		return falcuty;
+	}
+
+	public void setFalcuty(Falcuty falcuty) {
+		this.falcuty = falcuty;
 	}
 
 }

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.models.*;
+import com.example.demo.payload.request.UserRequest;
 import com.example.demo.repository.*;
 
 
@@ -28,8 +29,12 @@ import com.example.demo.repository.*;
 @RequestMapping("/api")
 public class UserController {
 	@Autowired
+	FalcutyRepository falcutyRepository;
+	
+	@Autowired
 	UserRepository userRepository;
 	
+	//Done
 	@GetMapping(value = "/users")
 	public ResponseEntity<List<User>> getAllUser(){
 		try {
@@ -42,22 +47,64 @@ public class UserController {
 		}
 	}
 	
+	//Done 
 	@GetMapping(value = "/users/{id}")
-	public ResponseEntity<User> getUser(){
-		return null;
+	public ResponseEntity<User> getUser(@PathVariable("id") long id){
+		 Optional<User> user = userRepository.findById(id);
+		 if(user.isPresent()) return new ResponseEntity<>(user.get(),HttpStatus.OK);
+		 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 	
+	
+	//Done
 	@PutMapping(value = "/users/{id}")
-	public ResponseEntity<User> updateUser(@PathVariable("id") long id, @RequestBody User user) {
-		//TODO: process PUT request
-		return null;
+	public ResponseEntity<User> updateUser(@PathVariable("id") long id, @RequestBody UserRequest userreq) {
+		
+		Optional<User> userData= userRepository.findById(id);
+		Falcuty falcuty = new Falcuty();
+		switch (userreq.getFalcuty()) {
+		case "SE":
+			falcuty = falcutyRepository.findByName(EFalcuty.FALCUTY_SE)
+					.orElseThrow(() -> new RuntimeException("Error : Falcuty is not found"));
+			break;
+		case "AI":
+			falcuty = falcutyRepository.findByName(EFalcuty.FALCUTY_AI)
+					.orElseThrow(() -> new RuntimeException("Error : Falcuty is not found"));
+			break;
+		case "IB":
+			falcuty = falcutyRepository.findByName(EFalcuty.FALCUTY_IB)
+					.orElseThrow(() -> new RuntimeException("Error : Falcuty is not found"));
+			break;
+		case "SA":
+			falcuty = falcutyRepository.findByName(EFalcuty.FALCUTY_SA)
+					.orElseThrow(() -> new RuntimeException("Error : Falcuty is not found"));
+			break;
+		}
+		
+		if(userData.isPresent()) {
+			User _user = userData.get();
+			_user.setUsername(userreq.getUsername());
+			_user.setAddress(userreq.getAddress());
+			_user.setEmail(userreq.getEmail());
+			_user.setPhonenumber(userreq.getPhonenumber());
+			_user.setFalcuty(falcuty);
+			return new ResponseEntity<>(userRepository.save(_user),HttpStatus.OK);
+		}
+		
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
+	//Done
 	@DeleteMapping(value = "/users/{id}")
-	public ResponseEntity<HttpStatus> deleteUser(@PathVariable String id) {
+	public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") long id) {
 		//TODO: process DELETE request
-		
-		return null;
+		try {
+			userRepository.deleteById(id);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} catch (Exception e) {
+			// TODO: handle exception
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 

@@ -1,5 +1,6 @@
 package com.example.demo.controllers;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,18 +35,18 @@ import com.example.demo.repository.UserRepository;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api/article")
+@RequestMapping("/api")
 public class ArticleController {
 	@Autowired
 	ArticleRepository articleRepository;
-	
-	@Autowired 
+
+	@Autowired
 	FalcutyRepository falcutyRepository;
-	
-	@Autowired 
+
+	@Autowired
 	UserRepository userRepository;
 
-	@GetMapping(value = "/all")
+	@GetMapping(value = "/articles")
 	public ResponseEntity<List<Article>> getAllArticle(@RequestParam(required = false) String title) {
 		try {
 			List<Article> articles = new ArrayList<Article>();
@@ -62,7 +63,7 @@ public class ArticleController {
 		}
 	}
 
-	@GetMapping(value = "/{id}")
+	@GetMapping(value = "/articles/{id}")
 	public ResponseEntity<Article> getArticleById(@PathVariable("id") long id) {
 		Optional<Article> articleData = articleRepository.findById(id);
 		if (articleData.isPresent())
@@ -70,12 +71,89 @@ public class ArticleController {
 		else
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
-	
-	@PostMapping(value = "/create")
-	public ResponseEntity<?> createArticle(@Valid @RequestBody ArticleRequest articleRequest) {
-		return new ResponseEntity<>(articleRequest,HttpStatus.OK);
-		
+
+	@PostMapping(value = "/articles")
+	public ResponseEntity<MessageResponse> createArticle(@Valid @RequestBody ArticleRequest articleRequest) {
+		Article article = new Article();
+		java.util.Date now = new Date();
+		article.setExpired_date(now);
+		article.setCreated_date(now);
+		article.setTitle(articleRequest.getTitle());
+		Date created_date = new Date();
+		Date expired_date = new Date();
+		try {
+			created_date = new SimpleDateFormat("yyyy-MM-dd").parse(articleRequest.getCreated_date());
+			expired_date = new SimpleDateFormat("yyyy-MM-dd").parse(articleRequest.getExpired_date());
+
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			return ResponseEntity.ok(new MessageResponse("catch u"));
+		}
+		boolean active = true;
+		if (articleRequest.getActive().equals("false"))
+			active = false;
+		article.setActive(active);
+		// Article article = new Article(articleRequest.getTitle(),now,now,active);
+		// Set User
+		// long num = Long.parseLong();
+		User u = userRepository.findById(Long.parseLong(articleRequest.getUserid()))
+				.orElseThrow(() -> new RuntimeException("Error : User is not found"));
+		article.setUser(u);
+		// Set Falcuty
+		Falcuty falcuty = new Falcuty();
+		switch (articleRequest.getFalcuty()) {
+		case "SE":
+			falcuty = falcutyRepository.findByName(EFalcuty.FALCUTY_SE)
+					.orElseThrow(() -> new RuntimeException("Error : Falcuty is not found"));
+			break;
+		case "AI":
+			falcuty = falcutyRepository.findByName(EFalcuty.FALCUTY_AI)
+					.orElseThrow(() -> new RuntimeException("Error : Falcuty is not found"));
+			break;
+		case "IB":
+			falcuty = falcutyRepository.findByName(EFalcuty.FALCUTY_IB)
+					.orElseThrow(() -> new RuntimeException("Error : Falcuty is not found"));
+			break;
+		case "SA":
+			falcuty = falcutyRepository.findByName(EFalcuty.FALCUTY_SA)
+					.orElseThrow(() -> new RuntimeException("Error : Falcuty is not found"));
+			break;
+		}
+		article.setFalcuty(falcuty);
+		articleRepository.save(article);
+		return ResponseEntity.ok(new MessageResponse("Article created successfully!" + article.getTitle() + " "
+				+ article.getCreated_date() + " " + article.getExpired_date()));
+
 	}
 
+	@PutMapping(value = "/articles/{id}")
+	public ResponseEntity<Article> updateArticle(@PathVariable("id") long id, @RequestBody Article article) {
+
+		Optional<Article> articleData = articleRepository.findById(id);
+		if (articleData.isPresent()) {
+			Article _article = articleData.get();
+			_article.setTitle(article.getTitle());
+			_article.setActive(article.isActive());
+			_article.setCreated_date(article.getCreated_date());
+			_article.setExpired_date(article.getExpired_date());
+			_article.setFalcuty(article.getFalcuty());
+			_article.setUser(article.getUser());
+			return new ResponseEntity<Article>(articleRepository.save(_article), HttpStatus.OK);
+		}
+
+		return new ResponseEntity<Article>(HttpStatus.NOT_FOUND);
+	}
+
+	@DeleteMapping(value = "/articles/{id}")
+	public ResponseEntity<HttpStatus> deleteArticle(@PathVariable("id") long id) {
+		// TODO: process DELETE request
+		try {
+			articleRepository.deleteById(id);
+			return new ResponseEntity<HttpStatus>(HttpStatus.OK);
+		} catch (Exception e) {
+			// TODO: handle exception
+			return new ResponseEntity<HttpStatus>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 }

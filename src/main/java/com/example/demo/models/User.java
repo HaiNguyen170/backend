@@ -42,14 +42,18 @@ public class User {
 	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles = new HashSet<>();
 
-	//Many students have only one falcuty
+	// Many students have only one falcuty
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "falcuty_id", nullable = false)
 	private Falcuty falcuty;
-	
-	//One users can create many articles
-	//@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	//private Set<Article> article;
+
+	// One users can create many articles
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<Article> article;
+
+	// One users can create many files
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<File> file;
 
 	public User() {
 	}

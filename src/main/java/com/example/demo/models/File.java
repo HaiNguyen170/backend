@@ -16,6 +16,8 @@ public class File {
 	private String name;
 
 	private String type;
+	
+	private boolean published;
 
 	@Lob
 	private byte[] data;
@@ -24,16 +26,21 @@ public class File {
 
 	}
 
-	public File(String name, String type, byte[] data) {
+	public File(String name, String type, byte[] data,boolean published) {
 		this.name = name;
 		this.type = type;
 		this.data = data;
+		this.published = published;
 	}
 
 	// Many files have only one article
-	//@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	//@JoinColumn(name = "article_id", nullable = false)
-	//private Article article;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "article_id", nullable = false)
+	private Article article;
+	
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "creator_id", nullable = false)
+	private User user;
 
 	public String getId() {
 		return id;
@@ -67,6 +74,31 @@ public class File {
 		this.data = data;
 	}
 
+	public boolean isPublished() {
+		return published;
+	}
+
+	public void setPublished(boolean published) {
+		this.published = published;
+	}
+
+	public Article getArticle() {
+		return article;
+	}
+
+	public void setArticle(Article article) {
+		this.article = article;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+	
+	
 	/*
 	 * -File is the data model corresponding to files table in database.
 	 * -FileRepository extends Spring Data JpaRepository which has methods to store
@@ -77,5 +109,6 @@ public class File {
 	 * exception when the controller preocesses file upload . -ResponseFile contains
 	 * configuration for Servlet Multipart and MySQL database connection
 	 */
+	
 
 }

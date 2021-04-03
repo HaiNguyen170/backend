@@ -22,8 +22,8 @@ public class Falcuty {
 	@OneToMany(mappedBy = "falcuty", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<User> user;
 	
-	//@OneToMany(mappedBy = "falcuty", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	//private Set<Article> article ;
+	@OneToMany(mappedBy = "falcuty", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<Article> article ;
 
 	public Falcuty(EFalcuty name) {
 		super();

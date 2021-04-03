@@ -9,18 +9,23 @@ public class ArticleRequest {
 	private String title;
 	
 	@NotBlank
+	@Size(max=100)
 	private String created_date;
 	
 	@NotBlank 
+	@Size(max=100)
 	private String expired_date;
 	
 	@NotBlank
+	@Size(max=100)
 	private String active;
 	
 	@NotBlank
-	private String falctuty;
+	@Size(max=100)
+	private String falcuty;
 	
 	@NotBlank 
+	@Size(max=100)
 	private String userid;
 
 	public String getTitle() {
@@ -47,8 +52,6 @@ public class ArticleRequest {
 		this.expired_date = expired_date;
 	}
 
-	
-
 	public String getActive() {
 		return active;
 	}
@@ -57,12 +60,12 @@ public class ArticleRequest {
 		this.active = active;
 	}
 
-	public String getFalctuty() {
-		return falctuty;
+	public String getFalcuty() {
+		return falcuty;
 	}
 
-	public void setFalctuty(String falctuty) {
-		this.falctuty = falctuty;
+	public void setFalcuty(String falctuty) {
+		this.falcuty = falctuty;
 	}
 
 	public String getUserid() {
